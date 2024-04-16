@@ -134,10 +134,9 @@ const loginUser = asyncHandler(async (req, res) => {
     user._id
   )
 
-  const loggedUser = await User.findById(user._id).select(
-    "-password  -refreshToken"
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
   );
-
   const options = {
     httpOnly: true,
     secure: true,
@@ -148,11 +147,15 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-      new ApiResponse(200, {
-        user: accessToken,
-        refreshToken,
-        loggedUser,
-      })
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        },
+        "User logged In Successfully"
+      )
     );
 });
 
