@@ -3,7 +3,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import {
   uploadOnCloudinary,
-  deleteImageFromCloudinary,
 } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -69,7 +68,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!avatar) {
-    throw new ApiError(400, "Avatar file is required");
+    throw new ApiError(400, "Error while required");
   }
 
   const existedUser = await User.findOne({
@@ -164,8 +163,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, {
-    $set: {
-      refreshToken: undefined,
+    $unset: {
+      refreshToken: 1,
     },
   });
   const options = {
@@ -288,7 +287,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error while uploading avatar on cloudinary");
   }
 
-  await deleteImageFromCloudinary(oldAvatar);
+  
 
   const user = await User.findByIdAndUpdate(
     req.user?._id,
@@ -319,7 +318,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while uploading Cover Image");
   }
 
-  await deleteImageFromCloudinary(oldCoverImage);
+  
   const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
